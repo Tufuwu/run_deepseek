@@ -1,4 +1,4 @@
-name: CI
+name: Python package
 
 on: [push, pull_request]
 
@@ -6,59 +6,25 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.8, 3.8, 3.8, 3.8]
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
-
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install wheel virtualenv tox coveralls
-
-    - name: Test with tox
+        pip install flake8
+        pip install coveralls
+        pip install rply
+    - name: Run tests and linting
       run: |
-        tox -e py${{ matrix.python }/./}-${{ matrix.django_version }}${{ matrix.mode }}
-      env:
-        DJANGO_VERSION: ${{ matrix.django_version }}
-        MODE: ${{ matrix.mode }}
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
-
-  matrix:
-    python: ["3.8", "3.8", "3.8", "3.8"]
-    django_version: [dj22, dj30, dj31, dj32, djdev]
-    mode: [flake8, flake8-strict, docs]
-    include:
-      - python: "3.8"
-        env:
-          MODE: flake8
-      - python: "3.8"
-        env:
-          MODE: flake8-strict
-      - python: "3.8"
-        env:
-          MODE: flake8-docs
-      - python: "3.8"
-        env:
-          DJANGO_VERSION: dj30
-      - python: "3.8"
-        env:
-          DJANGO_VERSION: dj31
-      - python: "3.8"
-        env:
-          DJANGO_VERSION: dj32
-      - python: "3.8"
-        env:
-          DJANGO_VERSION: djdev
+        coverage run test.py
+        flake8 .
+    - name: Coveralls
+      run: coveralls
