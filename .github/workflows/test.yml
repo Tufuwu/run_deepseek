@@ -10,40 +10,26 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python 3.8
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
-
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/tests.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements/tests.txt
-        pip install coveralls
+        pip install numpy==${{ matrix.numpy-version }} scipy matplotlib>=3 cython>=0.28
 
-    - name: Test with nose and flake8
-      run: |
-        nosetests --with-coverage --cover-erase --cover-package=temba_client
-        flake8
+    - name: Build
+      run: dev/build.sh
 
-    - name: Coveralls
-      run: coveralls
+    - name: Test
+      run: dev/test.sh
 
-    - name: Notify Slack
-      if: failure()
-      uses: 8398a7/action-slack@v3
-      with:
-        status: ${{ job.status }}
-        fields: repo,message,commit,author,action
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+# Matrix of Python and Numpy versions to test
+strategy:
+  matrix:
+    python-version: [3.8, 3.8, 3.8, 3.9]
+    numpy-version: [1.15.4, 1.19.4]
 
-# End-of-Code|
+# End-of-Code
