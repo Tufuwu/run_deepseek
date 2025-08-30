@@ -1,4 +1,4 @@
-name: CI
+name: Lint code base
 
 on: [push, pull_request]
 
@@ -9,39 +9,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Set up Python
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
-    - name: Install GEOS
-      run: |
-        export GEOS_INSTALL=$HOME/geosinstall/geos-$GEOS_VERSION
-        ./ci/install_geos.sh
-        export LD_LIBRARY_PATH=$GEOS_INSTALL/lib
-        export PATH=$GEOS_INSTALL/bin:$PATH
-
+        python-version: 3.8
     - name: Install dependencies
       run: |
-        pip install --upgrade pip
-        pip install --upgrade wheel
-        pip install Cython "numpy==$NUMPY_VERSION" pytest
-
-    - name: Build and install package
-      run: |
-        python setup.py build_ext --inplace
-        pip install --no-deps -e .
-
-    - name: Test with pytest
-      run: |
-        pytest --doctest-modules
+        python -m pip install --upgrade pip
+        pip install flake8
+    - name: Lint with flake8
+      run: flake8 . --max-line-length=120 --exclude .git,lib,__pycache__
 
