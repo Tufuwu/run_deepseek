@@ -1,4 +1,4 @@
-name: Python package
+name: Python application
 
 on: [push, pull_request]
 
@@ -6,24 +6,32 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.8, 3.8, 3.8, 3.9, 3.10]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.8
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install coinor-cbc
+      run: sudo apt-get install -y coinor-cbc
+
     - name: Install dependencies
-      run: |
-        python setup.py --quiet install
-        pip --quiet install -r test-requirements.txt
-    - name: Run tests
-      run: |
-        python setup.py --quiet test
-    - name: Coverage
-      run: |
-        coverage run --source circlify tests.py
-        coveralls
+      run: pip install -r requirements.txt
+
+    - name: Install package
+      run: python setup.py -q install
+
+    - name: Lint with flake8
+      run: flake8
+
+    - name: Test with pytest
+      run: pytest
+
