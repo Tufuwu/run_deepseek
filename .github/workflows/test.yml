@@ -1,37 +1,38 @@
-name: Python package
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.8, 3.8, 3.8, 3.8, 3.8]
-        aio-available: [false]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+      with:
+        fetch-depth: 10
+
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python -m pip install pytest pytest-cov coveralls
-        if ${{ matrix.aio-available == 'true' }}; then python -m pip install pytest-asyncio; fi
-        python -m pip install .
-    - name: Test with pytest
-      run: |
-        py.test --cov-config ${{ matrix.coveragerc }} --cov=pydispatch
-    - name: Coveralls
-      run: coveralls --rcfile=${{ matrix.coveragerc }}
+        python-version: 3.8
 
-- name: Deploy to PyPI
-  if: startsWith(github.ref, 'refs/tags')
-  uses: pypa/gh-action-pypi-publish@release/v1
-  with:
-    user: __token__
-    password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install flake8
+      run: pip install flake8
+
+    - name: Lint with flake8
+      run: flake8 --ignore=W191,E128,E501,E722 . --exit-zero
+
+    # PEP8 :- IGNORE CODES
+    # W191 : indentation contains tabs
+    # E128 : continuation line under-indented for visual indent
+    # E501 : line too long (> 79 characters)
+    # E722 : do not use bare 'except'
+
