@@ -1,27 +1,31 @@
-name: Python package
+name: CI
 
 on: [push, pull_request]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.8, 3.9, pypy-3.6]
-        django-version: ['2.2', '3.0', '3.2']
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Poetry
-      run: pip install poetry
-    - name: Install Dependencies
-      run: poetry install -q
-    - name: Install Django ${{ matrix.django-version }}
-      run: poetry run pip install -q Django~${{ matrix.django-version }}
-    - name: Test with pytest
-      run: poetry run python -m pytest
+        python-version: 3.8
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+    - name: Install jshint
+      run: npm install -g jshint
+
+    - name: Build with make
+      run: make
+
+    - name: Test with make
+      run: make test
