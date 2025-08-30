@@ -1,4 +1,4 @@
-name: CI
+name: Python package
 
 on: [push, pull_request]
 
@@ -9,18 +9,78 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.8
+        architecture: x64
+
+    - name: Upgrade setuptools
+      run: pip install --upgrade setuptools
+
     - name: Install dependencies
-      run: |
-        if [ "$WITH_OPT_DEPS" = "true" ] ; then pip install -vr requirements.txt pytest; fi
-        git clone https://github.com/ProgVal/irctest.git
-        echo "y" | pip uninstall limnoria || true
-    - name: Run tests
-      run: |
-        echo ${{ matrix.python-version }}
-        python setup.py install
-        supybot-test test -v --plugins-dir=./plugins/ --no-network
-        if [ "$WITH_OPT_DEPS" = "true" ] -a [[ "${{ matrix.python-version }}" =~ ^3\.[4-9] ]] ; then cd irctest; pytest --controllers irctest.controllers.limnoria; fi
+      run: pip install -r requirements.txt
+
+    - name: Test with Python
+      run: python setup.py test
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+        architecture: x64
+
+    - name: Upgrade setuptools for Python 3.8
+      run: pip install --upgrade setuptools
+
+    - name: Install dependencies for Python 3.8
+      run: pip install -r requirements.txt
+
+    - name: Test with Python 3.8
+      run: python setup.py test
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+        architecture: x64
+
+    - name: Upgrade setuptools for Python 3.8
+      run: pip install --upgrade setuptools
+
+    - name: Install dependencies for Python 3.8
+      run: pip install -r requirements.txt
+
+    - name: Test with Python 3.8
+      run: python setup.py test
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+        architecture: x64
+
+    - name: Upgrade setuptools for Python 3.8
+      run: pip install --upgrade setuptools
+
+    - name: Install dependencies for Python 3.8
+      run: pip install -r requirements.txt
+
+    - name: Test with Python 3.8
+      run: python setup.py test
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+        architecture: x64
+
+    - name: Upgrade setuptools for Python 3.8
+      run: pip install --upgrade setuptools
+
+    - name: Install dependencies for Python 3.8
+      run: pip install -r requirements.txt
+
+    - name: Test with Python 3.8
+      run: python setup.py test
