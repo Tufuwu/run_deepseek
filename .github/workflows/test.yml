@@ -5,49 +5,25 @@ on: [push, pull_request]
 jobs:
   build:
 
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python: [3.8, 3.8, 3.8, 3.8, 3.8, 3.9, pypy-3.6]
-        arch: [x64, x86]
-        include:
-          - os: windows-latest
-            python: 3.8
-            arch: x64
-          - os: windows-latest
-            python: 3.8
-            arch: x86
-          - os: windows-latest
-            python: 3.8
-            arch: x64
-          - os: windows-latest
-            python: 3.8
-            arch: x86
-          - os: windows-latest
-            python: 3.8
-            arch: x64
-          - os: windows-latest
-            python: 3.8
-            arch: x86
-          - os: windows-latest
-            python: 3.8
-            arch: x86
-          - os: windows-latest
-            python: pypy-3.6
-            arch: x86
-          - os: windows-latest
-            python: pypy-3.6
-            arch: x86
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python }}
+
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python }}
-        architecture: ${{ matrix.arch }}
+        python-version: '3.8'
+
     - name: Install dependencies
-      run: pip install mock
-    - name: Test with unittest
-      run: python -m unittest discover -p *_test.py
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq libhdf5-serial-dev
+        python -m pip install --upgrade pip setuptools wheel virtualenv
+        pip install tox tox-travis codecov
+
+    - name: Run tests
+      run: tox
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
