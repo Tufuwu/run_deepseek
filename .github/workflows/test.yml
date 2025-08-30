@@ -1,6 +1,10 @@
 name: Python package
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
@@ -9,21 +13,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Set up Python
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
-
+        python-version: 3.8
     - name: Install dependencies
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -qq libhdf5-serial-dev
-        python -m pip install --upgrade pip setuptools wheel virtualenv
-        pip install tox tox-travis codecov
-
-    - name: Run tests
-      run: tox
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+        python -m pip install --upgrade pip
+        pip install -r dev-requirements.txt
+        pip install -e .
+    - name: Test with pytest and coverage
+      run: |
+        pytest --vcr-record=none --cov=tenable tests
+    - name: Deploy to PyPI
+      if: startsWith(github.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: stevemcgrath
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        skip_existing: true
