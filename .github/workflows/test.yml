@@ -1,15 +1,16 @@
-name: Python package
+name: CI
 
 on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        python-version: [3.8, 3.8, 3.8]
-        django-version: ['django21', 'django22', 'django30', 'django31']
+        python-version: [3.8, 3.8, 3.8, 3.8, 3.9]
+        django-version: [2.2, 3.0, 3.1, 'main']
+        toxenv: [flake8, integration, py38-django22, py38-django22, py38-django22, py38-django22, py39-django22, py38-django30, py38-django30, py38-django30, py38-django30, py39-django30, py38-django31, py38-django31, py38-django31, py38-django31, py39-django31, py38-djangomain, py38-djangomain, py38-djangomain, py38-djangomain, py39-djangomain]
 
     steps:
     - uses: actions/checkout@v2
@@ -17,19 +18,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox coverage
-    - name: Test with tox
-      run: |
-        export TOX_ENV=py${{ matrix.python-version }}-${{ matrix.django-version }}
-        tox -r -e "$TOX_ENV"
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
+    - name: Install Tox
+      run: pip install tox
+    - name: Test with Tox
+      run: tox -e ${{ matrix.toxenv }}
