@@ -13,12 +13,23 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install python3-pip
-        pip3 install -r requirements.txt
-        pip3 install tox
-    - name: Run tox
-      run: tox
+        python -m pip install --upgrade pip
+        pip install django bs4
+    - name: Test with setup.py
+      run: |
+        env PYTHONPATH=`pwd` python setup.py test
 
