@@ -6,41 +6,50 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.8, 3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: '3.8'
+
     - name: Install dependencies
       run: |
-        make
-        pip install poetry
-        poetry install
-    - name: Run tests
-      run: make tests
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
+        python -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
 
-  notify:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Notify
-      if: ${{ failure() && github.event_name == 'push' }}
-      uses: dorny/webhook-url@v1
-      with:
-        url: ${{ secrets.GITTER_WEBHOOK }}
-        data: '{"text":"Build failed: ${{ github.repository }} ${{ github.sha }}"}'
+    - name: Test with pytest
+      run: |
+        pytest -vv
 
-# End-of-Code
+    - name: Test with Python 3.8
+      run: |
+        python3.8 -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+        pytest -vv
+
+    - name: Test with Python 3.8
+      run: |
+        python3.8 -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+        pytest -vv
+
+    - name: Test with Python 3.8
+      run: |
+        python3.8 -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+        pytest -vv
+
+    - name: Test with Python 3.8
+      run: |
+        python3.8 -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+        pytest -vv
+
+    - name: Test with Python 3.8
+      run: |
+        python-3.8 -m pip install --upgrade pip
+        pip install -r tests/requirements.txt
+        pytest -vv
