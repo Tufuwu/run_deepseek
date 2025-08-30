@@ -1,40 +1,27 @@
-name: Python package
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+      - dev
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.8, 3.8, 3.8, 3.8, 3.8]
-        toxenv: [py38, py38, py38, py38, py38, py39, black, pep8py2, pep8py3, doc]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.8.4
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Get pip cache dir
-      id: pip-cache
-      run: |
-        echo "::set-output name=dir::$(pip cache dir)"
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.pip-cache.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+        python-version: 3.8
+    - name: Upgrade pip
+      run: pip install --upgrade pip
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip setuptools
-        pip install tox codecov
-    - name: Test with tox
-      run: |
-        tox
-    - name: Upload coverage to Codecov
-      run: |
-        codecov
+      run: pip install numpy scipy matplotlib pandas sympy nose statsmodels tabulate
+    - name: Install package
+      run: pip install .
+    - name: Run tests
+      run: nosetests
