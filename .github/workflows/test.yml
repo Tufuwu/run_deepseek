@@ -1,4 +1,4 @@
-name: Unit tests
+name: CI
 
 on: [push, pull_request]
 
@@ -9,23 +9,35 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y verilator libevent-dev libjson-c-dev
-        wget https://raw.githubusercontent.com/enjoy-digital/litex/main/litex_setup.py
-        python3 litex_setup.py init install
-        wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-20171231-x86_64-linux-centos6.tar.gz
-        tar -xvf riscv64-unknown-elf-gcc-20171231-x86_64-linux-centos6.tar.gz
-        export PATH=$PATH:$PWD/riscv64-unknown-elf-gcc-20171231-x86_64-linux-centos6/bin/
-
+        python -m pip install --upgrade pip
+        pip install bandit flake8 python-coveralls coverage liccheck
+        pip install -r requirements.txt
+        python setup.py bdist_wheel
+        pip install dist/feedgen*
     - name: Run tests
+      run: make test
+    - name: Check licenses
+      run: liccheck -s .licenses.ini
+    - name: Generate feeds
       run: |
-        python setup.py test
+        python -m feedgen
+        python -m feedgen atom
+        python -m feedgen rss
+    - name: Coveralls
+      run: coveralls
 
+# End-of-Code
