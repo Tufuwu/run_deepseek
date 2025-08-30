@@ -9,27 +9,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
-
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install codecov coverage
-
-    - name: Test with nose and coverage
-      run: |
-        nosetests --verbose --with-coverage --cover-erase --cover-package=catkin_lint test
-
-    - name: Upload coverage to Codecov
-      run: codecov
+        pip install tox-travis coveralls
+    - name: Test with tox
+      run: tox
+    - name: Coveralls
+      run: coveralls
 
