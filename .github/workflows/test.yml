@@ -1,14 +1,20 @@
-name: Python package
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+  release:
+    types: [published]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.8, 3.8, 3.8, 3.8, 3.8, 3.9]
+        python-version: [3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -16,10 +22,27 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install tox
-    - name: Test with tox
+        pip install -r requirements.txt
+
+    - name: Test with pydot_unittest
       run: |
-        tox -e py
+        cd test/
+        python pydot_unittest.py
+
+    - name: Install pydot
+      run: |
+        python setup.py sdist
+        pip install dist/pydot-*.tar.gz
+
+    - name: Black check
+      run: |
+        pip install black
+        black --check --diff .
+
+    - name: Graphviz install
+      run: |
+        sudo apt-get install graphviz
