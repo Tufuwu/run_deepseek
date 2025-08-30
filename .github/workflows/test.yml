@@ -1,18 +1,38 @@
-name: Build and Check Table
+name: Python application
 
 on: [push, pull_request]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Run scripts
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
       run: |
-        ./scripts/link-format-chk.sh
-        ./scripts/buildtable.pl >/tmp/table.mediawiki || exit 1
-        diff README.mediawiki /tmp/table.mediawiki | grep '^[<>] |' >/tmp/after.diff || true
-        if git checkout HEAD^ && ./scripts/buildtable.pl >/tmp/table.mediawiki 2>/dev/null; then diff README.mediawiki /tmp/table.mediawiki | grep '^[<>] |' >/tmp/before.diff || true; newdiff=$(diff -s /tmp/before.diff /tmp/after.diff -u | grep '^+'); if [ -n "$newdiff" ]; then echo "$newdiff"; exit 1; fi; else echo 'Cannot build previous commit table for comparison'; fi
+        python -m pip install --upgrade pip
+        pip install -r dev-requirements.txt
+    - name: Lint with flake8
+      run: flake8 sendgrid_backend/
+    - name: Check import order with isort
+      run: isort -c ./
+    - name: Check formatting with black
+      run: black --check ./
+    - name: Type check with mypy
+      run: mypy sendgrid_backend/
+    - name: Test with tox
+      run: tox
+
