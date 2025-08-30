@@ -1,4 +1,4 @@
-name: Python package
+name: Python application
 
 on: [push, pull_request]
 
@@ -6,19 +6,21 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.8]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.8
     - name: Install dependencies
+      run: pip install -r requirements/ci.txt
+    - name: Run tests and generate coverage report
       run: |
-        CFLAGS="-O0" pip install . --upgrade
-    - name: Run tests
-      run: ./runtests.sh
-
+        coverage run manage.py test
+        coverage report
+        coverage xml
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        file: coverage/coverage.xml
