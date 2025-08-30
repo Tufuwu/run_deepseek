@@ -1,4 +1,4 @@
-name: CI
+name: Pygount CI
 
 on: [push, pull_request]
 
@@ -16,15 +16,21 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install doc8 sphinx
-        pip install git+https://github.com/osrf/sphinx-tabs
-        pip install sphinx_multiversion
-    - name: Build the documentation
+        pip install -r dev-requirements.txt
+    - name: Lint with pre-commit
       run: |
-        make html 2> stderr.log
-        cat stderr.log
-    - name: Check documentation
+        pre-commit run --all-files
+    - name: Test with pytest
       run: |
-        doc8 --ignore D001 --ignore-path build --ignore-path source/Tutorials/Actions
-        doc8 --ignore D000 --ignore D001 --ignore-path build source/Tutorials/Actions
-        if [ -s "stderr.log" ]; then false; fi
+        python setup.py develop
+        pytest --verbose
+    - name: Build and install the package
+      run: |
+        python setup.py bdist_wheel
+        python setup.py install
+    - name: Test drive the installed pygount
+      run: |
+        pygount --version
+        pygount --help
+        pygount pygount *.cfg *.yaml
+        pygount --format=summary pygount *.cfg *.yaml
