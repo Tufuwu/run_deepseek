@@ -1,4 +1,4 @@
-name: Python package
+name: CI
 
 on: [push, pull_request]
 
@@ -6,25 +6,28 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8, 3.8, 3.8]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+        python-version: '3.9'
+
+    - name: Update pip
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install .
-        pip install flake8
-    - name: Lint with flake8
+
+    - name: Install dependencies
       run: |
-        flake8 img2gb test
+        pip install -U numpy Cython
+        pip install h5py==3.8
+        pip install -r requirements_tests.txt
+        pip install .
+        pip install -e examples/example_hdf5storage_marshaller_plugin
+
     - name: Test with pytest
       run: |
-        pytest -v test
+        pytest
+
