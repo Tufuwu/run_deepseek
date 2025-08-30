@@ -7,22 +7,23 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python-version: [3.8, 3.8, 3.9, 3.8]
+
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
-
-    - name: Install Django
-      run: pip install Django==1.11
-
-    - name: Install package
-      run: pip install .[flake8,tests]
-
-    - name: Run flake8
-      run: flake8
-
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r mock/requirements.txt
+        pip install pytest-cov
     - name: Run tests
-      run: pytest
-
+      run: |
+        PYTHON=python${{ matrix.python-version }} ./mock/run-tests.sh
+      env:
+        PYTHON: python${{ matrix.python-version }}
