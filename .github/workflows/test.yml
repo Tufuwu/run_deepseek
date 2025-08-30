@@ -1,41 +1,28 @@
-name: Travis CI
+name: Python package
 
 on: [push, pull_request]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
+    - uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
-
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
+        python-version: '3.8'
     - name: Install dependencies
       run: |
-        sudo apt update
-        sudo apt install -y gettext rsync python-sphinx python3-sphinx python-pyqt5 python3-pyqt5 python3-venv
-
-    - name: Build translations
-      run: make all
-
-    - name: Install tox
-      run: pip install tox tox-venv
-
+        python -m pip install --upgrade pip
+        pip install simplejson minimock coverage
     - name: Run tests
-      run: tox
+      run: make test
 
-    - name: Run pylint
-      run: tox -e pylint
+- name: Deploy
+  if: github.event_name == 'push' && github.ref == 'refs/tags/${{ github.event.release.tag_name }}'
+  uses: pypa/gh-action-pypi-publish@release/v1
+  with:
+    user: ${{ secrets.PYPI_USERNAME }}
+    password: ${{ secrets.PYPI_PASSWORD }}
