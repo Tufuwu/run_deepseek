@@ -1,4 +1,4 @@
-name: Python application
+name: Python package
 
 on: [push, pull_request]
 
@@ -6,32 +6,19 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.8]
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Set up Python 3.8
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
-
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install coinor-cbc
-      run: sudo apt-get install -y coinor-cbc
-
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: pip install -r requirements.txt
-
-    - name: Install package
-      run: python setup.py -q install
-
-    - name: Lint with flake8
-      run: flake8
-
-    - name: Test with pytest
-      run: pytest
+      run: |
+        CFLAGS="-O0" pip install . --upgrade
+    - name: Run tests
+      run: ./runtests.sh
 
