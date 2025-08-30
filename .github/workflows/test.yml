@@ -1,33 +1,29 @@
-name: CI
+name: Python package
 
 on: [push, pull_request]
 
 jobs:
   build:
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.8, 3.8, 3.8, 3.8, 3.8, 3.9, pypy, pypy-3.6]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python3 setup.py install
-        sudo apt-get -y update
-        pip install pytest-cov
-        pip install .[ja]
-    - name: Run tests
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+    - name: Lint with flake8
       run: |
-        python3 -m pytest
-        ./test.sh
+        flake8 .
+    - name: Test with pytest
+      run: |
+        pytest -v .
+# End-of-Code|
