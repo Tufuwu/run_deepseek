@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.8, 3.8, 3.8, 3.8, 3.9, 3.8, pypy-3.6]
+        python-version: [3.8, 3.8, 3.8, 3.9, 3.8]
 
     steps:
     - uses: actions/checkout@v2
@@ -19,9 +19,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install bitstring>=3.1.3
-        pip install pyflakes
-    - name: Run tests
+        pip install tox pip virtualenv
+        pip install -e .
+        pip install pytest-cov codecov -r tests/requirements.txt
+    - name: Test with tox
       run: |
-        python setup.py test
-        pyflakes pybufrkit tests *.py
+        tox
+    - name: Test with pytest and coverage
+      run: |
+        py.test tests/ example/ --cov=./
+        codecov
