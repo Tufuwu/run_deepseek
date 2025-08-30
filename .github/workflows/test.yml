@@ -1,4 +1,4 @@
-name: CI
+name: Python package
 
 on: [push, pull_request]
 
@@ -9,19 +9,116 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8, 3.8, 3.8, 3.8, 3.8
-
+        python-version: '3.8'
+        architecture: 'x64'
     - name: Install dependencies
       run: |
-        if [[ ${{ matrix.python-version }} == 2* ]]; then pip install -r py2_requirements.txt; fi
-        if [[ ${{ matrix.python-version }} == 3* ]]; then pip install -r py3_requirements.txt; fi
+        python -m pip install --upgrade pip
+        pip install tox-travis coveralls
+    - name: Test with tox
+      run: tox
+    - name: Report coverage to coveralls
+      run: coveralls
 
-    - name: Run tests
-      run: make test
+  build-python-3.8:
 
-    - name: Print Python version
-      run: echo "Python version is ${{ matrix.python-version }}"
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis coveralls
+    - name: Test with tox
+      run: tox
+    - name: Report coverage to coveralls
+      run: coveralls
+
+  build-python-3.8:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis coveralls
+    - name: Test with tox
+      run: tox
+    - name: Report coverage to coveralls
+      run: coveralls
+
+  build-python-3.8:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis coveralls
+    - name: Test with tox
+      run: tox
+    - name: Report coverage to coveralls
+      run: coveralls
+
+  build-python-3.8:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis coveralls
+    - name: Test with tox
+      run: tox
+    - name: Report coverage to coveralls
+      run: coveralls
+
+  build-python-3.8:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis coveralls
+    - name: Test with tox
+      run: tox
+    - name: Report coverage to coveralls
+      run: coveralls
