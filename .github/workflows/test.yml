@@ -1,42 +1,29 @@
-name: Python package
+name: CI
 
 on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.8, 3.8]
+        env: [cover, black]
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
-        architecture: 'x64'
-
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: make setup
-
-    - name: Lint with flake8
-      run: make lint
-
-    - name: Test with coverage
-      run: make travis-test
-
-    - name: Build the docs
-      run: make docs
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
-
-    - name: Check build
-      run: make
-
+      run: |
+        npm i -g elm
+        pip install tox-travis
+    - name: Test with tox
+      run: tox
+    - name: Coveralls
+      run: coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
